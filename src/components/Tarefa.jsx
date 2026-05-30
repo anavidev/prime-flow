@@ -1,9 +1,19 @@
-export default function Tarefa({ tarefa }) {
+export default function Tarefa({ tarefa, onClick }) {
 	return (
-		<li className="bg-white p-2 mb-2 rounded-lg shadow text-black">
+		<li
+			className="cursor-pointer bg-white p-2 mb-2 rounded-lg shadow text-black transition hover:bg-gray-50"
+			onClick={onClick}
+			onKeyDown={(event) => {
+				if (event.key === 'Enter' || event.key === ' ') {
+					event.preventDefault()
+					onClick?.()
+				}
+			}}
+			role="button"
+			tabIndex={0}
+		>
 			<h3 className="font-bold">{tarefa.titulo}</h3>
 			<span className="border border-gray-700 px-2 py-1 text-xs font-semibold rounded-md">{tarefa.dataCriacao}</span>
-			{/* <p>{tarefa.descricao}</p> */}
 			<div className="my-2 flex flex-row items-end gap-2 justify-between">
 				<p className="text-md text-gray-500">{tarefa.id}</p>
 				<div className=" h-4 mx-2 flex flex-row items-end gap-2">
