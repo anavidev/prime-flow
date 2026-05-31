@@ -1,4 +1,4 @@
-import { tasks as initialTasks, columns as initialColumns, projects as initialProjects } from '../dados';
+import { users as initialUsers, tasks as initialTasks, columns as initialColumns, projects as initialProjects } from '../dados';
 
 const loadFromStorage = (key, defaultData) => {
   const stored = localStorage.getItem(key);
@@ -32,7 +32,14 @@ const saveToStorage = () => {
   localStorage.setItem('primeflow_projects', JSON.stringify(projects));
 };
 
-export const getProjects = () => {
+export const getCurrentUser = () => {
+  return initialUsers[0];
+};
+
+export const getProjects = (userId) => {
+  if (userId) {
+    return projects.filter(p => p.ownerId === userId || p.members.includes(userId));
+  }
   return projects;
 };
 
@@ -61,7 +68,7 @@ export const saveTask = (task) => {
       65 + Math.floor(Math.random() * 26)
     );
     const randomNumbers = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-    
+
     const newTask = {
       ...task,
       id: `${randomLetters}-${randomNumbers}`,
