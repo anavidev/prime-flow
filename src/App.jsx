@@ -1,21 +1,27 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import Board from './components/Board';
 import { getProjects, getProjectById, getCurrentUser } from './services/apiFake';
 
 function App() {
+	const navigate = useNavigate();
 	const [projects, setProjects] = useState([]);
 	const [currentProjectId, setCurrentProjectId] = useState(null);
 
 	useEffect(() => {
 		const currentUser = getCurrentUser();
-		const userProjects = getProjects(currentUser?.id);
+		if (!currentUser) {
+			navigate('/login');
+			return;
+		}
+		const userProjects = getProjects(currentUser.id);
 		setProjects(userProjects);
 		if (userProjects.length > 0) {
 			setCurrentProjectId(userProjects[0].id);
 		}
-	}, []);
+	}, [navigate]);
 
 	const currentProject = currentProjectId ? getProjectById(currentProjectId) : null;
 

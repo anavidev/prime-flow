@@ -3,7 +3,7 @@ import { Search, SlidersHorizontal, Settings2 } from 'lucide-react';
 
 const Header = ({ currentProject }) => {
   const projectName = currentProject?.name || 'Selecione um projeto';
-  
+
   return (
     <header className="px-7 pt-5 pb-[18px] bg-prime-white border-b border-prime-branco-bord flex items-end justify-between gap-5 shrink-0">
       <div className="flex-1 min-w-0">
@@ -15,7 +15,7 @@ const Header = ({ currentProject }) => {
         </h1>
       </div>
       <div className="flex items-center gap-3 shrink-0">
-        <div className="flex items-center gap-2 border-2 border-prime-branco-bord rounded-search px-3 h-9 w-[240px] bg-prime-white">
+        <div className="flex items-center gap-2 border-2 border-prime-branco-bord rounded-search px-3 h-9 w-60 bg-prime-white">
           <Search className="w-3.5 h-3.5 text-prime-branco-bord shrink-0" />
           <input
             type="text"

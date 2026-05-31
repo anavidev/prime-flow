@@ -1,9 +1,17 @@
 import React from 'react';
-import { getCurrentUser } from '../services/apiFake';
+import { useNavigate } from 'react-router-dom';
+import { getCurrentUser, logout } from '../services/apiFake';
 import { LogOut, Settings } from 'lucide-react';
 
 const Sidebar = ({ projects = [], currentProjectId, onSelectProject }) => {
+  const navigate = useNavigate();
   const currentUser = getCurrentUser();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
   const initials = currentUser?.name
     ? currentUser.name
         .split(' ')
@@ -29,9 +37,13 @@ const Sidebar = ({ projects = [], currentProjectId, onSelectProject }) => {
         </div>
         <div className="flex-1 min-w-0">
           <div className="text-[14px] font-semibold text-prime-preto leading-[1.3]">{currentUser?.name ?? 'Usuário'}</div>
-          <div className="text-[11px] text-prime-preto-50 mt-[1px]">{currentUser?.role ?? 'Cargo'}</div>
+          <div className="text-[11px] text-prime-preto-50 mt-px">{currentUser?.role ?? ''}</div>
         </div>
-        <button className="w-7 h-7 rounded-md border-none bg-transparent grid place-items-center cursor-pointer text-prime-preto-50 hover:text-prime-preto hover:bg-prime-branco-bord transition-colors" title="Sair">
+        <button
+          onClick={handleLogout}
+          className="w-7 h-7 rounded-md border-none bg-transparent grid place-items-center cursor-pointer text-prime-preto-50 hover:text-prime-preto hover:bg-prime-branco-bord transition-colors"
+          title="Sair"
+        >
           <LogOut className="w-4 h-4" />
         </button>
       </div>
