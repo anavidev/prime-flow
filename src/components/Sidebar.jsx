@@ -64,10 +64,10 @@ const Sidebar = ({ projects = [], currentProjectId, onSelectProject }) => {
         ))}
       </div>
 
-      <div className="mt-auto border-t border-prime-branco-bord py-3.5 px-5 flex items-center gap-2 text-prime-preto-50 text-[13px] cursor-pointer hover:text-prime-preto transition-colors">
+      {/* <div className="mt-auto border-t border-prime-branco-bord py-3.5 px-5 flex items-center gap-2 text-prime-preto-50 text-[13px] cursor-pointer hover:text-prime-preto transition-colors">
         <Settings className="w-[18px] h-[18px]" />
         Configurações
-      </div>
+      </div> */}
     </aside>
   );
 };

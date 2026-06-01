@@ -15,7 +15,7 @@ const Header = ({ currentProject }) => {
         </h1>
       </div>
       <div className="flex items-center gap-3 shrink-0">
-        <div className="flex items-center gap-2 border-2 border-prime-branco-bord rounded-search px-3 h-9 w-60 bg-prime-white">
+        {/* <div className="flex items-center gap-2 border-2 border-prime-branco-bord rounded-search px-3 h-9 w-60 bg-prime-white">
           <Search className="w-3.5 h-3.5 text-prime-branco-bord shrink-0" />
           <input
             type="text"
@@ -28,7 +28,7 @@ const Header = ({ currentProject }) => {
         </button>
         <button className="w-[34px] h-[34px] rounded-full border-2 border-prime-branco-bord grid place-items-center cursor-pointer text-prime-preto-50 bg-transparent hover:text-prime-preto transition-colors" title="Tema">
           <Settings2 className="w-4 h-4" />
-        </button>
+        </button> */}
       </div>
     </header>
   );
