@@ -16,6 +16,7 @@ import { Plus } from 'lucide-react';
 import TaskColumn from './TaskColumn';
 import TaskModal from './TaskModal';
 import TaskCard from './TaskCard';
+import ConfirmModal from './ConfirmModal';
 import { getColumnsData, saveTask, deleteTask, createColumn, updateColumn, deleteColumn, moveTask } from '../services/apiFake';
 
 const Board = ({ currentProjectId }) => {
@@ -24,6 +25,8 @@ const Board = ({ currentProjectId }) => {
   const [selectedTask, setSelectedTask] = useState(null);
   const [activeTaskId, setActiveTaskId] = useState(null);
   const [dragOrigin, setDragOrigin] = useState(null);
+  const [editingColumnId, setEditingColumnId] = useState(null);
+  const [pendingDeleteColumnId, setPendingDeleteColumnId] = useState(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -125,7 +128,6 @@ const Board = ({ currentProjectId }) => {
   };
 
   const handleAddCard = (columnId) => {
-    // Passa um molde vazio com a coluna de destino e o projeto preenchidos
     setSelectedTask({ projectId: currentProjectId, columnId, title: '', description: '', tags: [], assignees: [], priority: '' });
     setIsModalOpen(true);
   };
@@ -143,27 +145,45 @@ const Board = ({ currentProjectId }) => {
   };
 
   const handleAddColumn = () => {
-    const title = window.prompt('Digite o nome da nova coluna:');
-    if (title && title.trim() && currentProjectId) {
-      // Vincula automaticamente ao projeto atual
-      createColumn(title.trim(), currentProjectId);
-      loadData();
-    }
+    if (!currentProjectId) return;
+    const newCol = createColumn('', currentProjectId);
+    loadData();
+    setEditingColumnId(newCol.id);
   };
 
   const handleEditColumn = (colId, currentTitle) => {
-    const title = window.prompt('Renomear coluna:', currentTitle);
-    if (title && title.trim() && title !== currentTitle) {
-      updateColumn(colId, title.trim());
-      loadData();
-    }
+    setEditingColumnId(colId);
   };
 
-  const handleDeleteColumn = (colId) => {
-    if (window.confirm('Tem certeza que deseja excluir esta coluna? Todas as tarefas nela serão apagadas.')) {
-      deleteColumn(colId);
-      loadData();
+  const requestDeleteColumn = (colId) => {
+    setPendingDeleteColumnId(colId);
+  };
+
+  const confirmDeleteColumn = () => {
+    if (!pendingDeleteColumnId) return;
+    deleteColumn(pendingDeleteColumnId);
+    loadData();
+    setPendingDeleteColumnId(null);
+  };
+
+  const cancelDeleteColumn = () => {
+    setPendingDeleteColumnId(null);
+  };
+
+  const handleRenameColumn = (colId, newTitle) => {
+    if (!newTitle || !newTitle.trim()) {
+      const col = columnsData.find(c => c.id === colId);
+      if (col && (!col.title || col.title === '')) {
+        deleteColumn(colId);
+        loadData();
+        setEditingColumnId(null);
+        return;
+      }
+      return;
     }
+    updateColumn(colId, newTitle.trim());
+    loadData();
+    setEditingColumnId(null);
   };
 
   const handleDragStart = (event) => {
@@ -254,7 +274,9 @@ const Board = ({ currentProjectId }) => {
               onCardClick={handleCardClick}
               onAddClick={() => handleAddCard(col.id)}
               onEditColumn={() => handleEditColumn(col.id, col.title)}
-              onDeleteColumn={() => handleDeleteColumn(col.id)}
+              onDeleteColumn={() => requestDeleteColumn(col.id)}
+              editingColumnId={editingColumnId}
+              onRenameColumn={handleRenameColumn}
             />
           ))}
 
@@ -278,6 +300,13 @@ const Board = ({ currentProjectId }) => {
         task={selectedTask}
         onSave={handleSave}
         onDelete={handleDelete}
+      />
+      <ConfirmModal
+        isOpen={!!pendingDeleteColumnId}
+        title="Excluir coluna"
+        message="Tem certeza que deseja excluir esta coluna? Todas as tarefas nela serão apagadas."
+        onConfirm={confirmDeleteColumn}
+        onCancel={cancelDeleteColumn}
       />
     </div>
   );

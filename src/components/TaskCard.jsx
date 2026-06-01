@@ -5,14 +5,18 @@ import { Calendar, ChevronsDown } from 'lucide-react';
 import { users } from '../dados';
 
 const TaskCardContent = ({ task }) => {
-  // Buscar a inicial do primeiro assignee mockado
   const firstAssignee = task.assignees?.length > 0
     ? users.find(u => u.id === task.assignees[0])
     : null;
 
-  // Formatar data mockada
   const formattedDate = task.endDate
-    ? new Date(task.endDate).toLocaleDateString('pt-BR')
+    ? (() => {
+        try {
+          const parts = task.endDate.split('-'); // YYYY-MM-DD
+          if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+        } catch (e) {}
+        return task.endDate;
+      })()
     : 'DD/MM/AAAA';
 
   return (

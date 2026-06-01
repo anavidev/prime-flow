@@ -4,7 +4,7 @@ import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { Plus, Edit2, Trash2 } from 'lucide-react';
 import TaskCard from './TaskCard';
 
-const TaskColumn = ({ id, title, count, tasks, activeTaskId, onCardClick, onAddClick, onEditColumn, onDeleteColumn }) => {
+const TaskColumn = ({ id, title, count, tasks, activeTaskId, onCardClick, onAddClick, onEditColumn, onDeleteColumn, editingColumnId, onRenameColumn }) => {
   const { isOver, setNodeRef } = useDroppable({
     id,
   });
@@ -20,10 +20,22 @@ const TaskColumn = ({ id, title, count, tasks, activeTaskId, onCardClick, onAddC
     >
       <div className="px-5 pt-4 pb-3.5 border-b border-prime-branco-bord text-[15px] font-bold text-prime-preto flex items-center justify-between">
         <div className="flex items-center gap-2 max-w-[80%]">
-          <span className="truncate" title={title}>{title}</span>
-          <span className="text-[11px] font-semibold bg-prime-board-bg border border-prime-branco-bord rounded-full px-2 py-[1px] text-prime-preto-50 shrink-0">
-            {count}
-          </span>
+          {editingColumnId === id ? (
+            <input
+              className="border rounded px-2 py-1"
+              defaultValue={title}
+              onBlur={(e) => onRenameColumn(id, e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); if (e.key === 'Escape') onRenameColumn(id, title); }}
+              autoFocus
+            />
+          ) : (
+            <>
+              <span className="truncate" title={title}>{title}</span>
+              <span className="text-[11px] font-semibold bg-prime-board-bg border border-prime-branco-bord rounded-full px-2 py-[1px] text-prime-preto-50 shrink-0">
+                {count}
+              </span>
+            </>
+          )}
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
           <button onClick={onEditColumn} className="w-[20px] h-[20px] rounded-sm bg-transparent border-none cursor-pointer grid place-items-center text-prime-preto-50 hover:text-prime-azul hover:bg-prime-azul-25 transition-colors" title="Renomear Coluna">
