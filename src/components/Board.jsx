@@ -8,7 +8,7 @@ const Board = ({ currentProjectId }) => {
   const [columnsData, setColumnsData] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
-  
+
   const loadData = () => {
     if (currentProjectId) {
       setColumnsData(getColumnsData(currentProjectId));
@@ -90,12 +90,12 @@ const Board = ({ currentProjectId }) => {
     <div className="flex-1 overflow-auto bg-prime-board-bg px-7 py-6">
       <div className="flex gap-5 items-start min-h-full">
         {columnsData.map((col) => (
-          <TaskColumn 
-            key={col.id} 
+          <TaskColumn
+            key={col.id}
             id={col.id}
-            title={col.title} 
-            count={col.tasks.length} 
-            tasks={col.tasks} 
+            title={col.title}
+            count={col.tasks.length}
+            tasks={col.tasks}
             onCardClick={handleCardClick}
             onAddClick={() => handleAddCard(col.id)}
             onEditColumn={() => handleEditColumn(col.id, col.title)}
@@ -106,7 +106,7 @@ const Board = ({ currentProjectId }) => {
           />
         ))}
 
-        <button 
+        <button
           onClick={handleAddColumn}
           className="w-[52px] h-[52px] rounded-full border-2 border-prime-branco-bord bg-prime-white text-prime-preto-50 grid place-items-center cursor-pointer shrink-0 self-start mt-1 transition-colors hover:border-prime-azul hover:text-prime-azul"
           title="Adicionar coluna"

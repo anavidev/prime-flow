@@ -1,4 +1,4 @@
-import { tasks as initialTasks, columns as initialColumns, projects as initialProjects } from '../dados';
+import { users as initialUsers, tasks as initialTasks, columns as initialColumns, projects as initialProjects } from '../dados';
 
 const loadFromStorage = (key, defaultData) => {
   const stored = localStorage.getItem(key);
@@ -25,14 +25,82 @@ const loadFromStorage = (key, defaultData) => {
 let tasks = loadFromStorage('primeflow_tasks', initialTasks);
 let columns = loadFromStorage('primeflow_columns', initialColumns);
 let projects = loadFromStorage('primeflow_projects', initialProjects);
+let users = loadFromStorage('primeflow_users', initialUsers);
 
 const saveToStorage = () => {
   localStorage.setItem('primeflow_tasks', JSON.stringify(tasks));
   localStorage.setItem('primeflow_columns', JSON.stringify(columns));
   localStorage.setItem('primeflow_projects', JSON.stringify(projects));
+  localStorage.setItem('primeflow_users', JSON.stringify(users));
 };
 
-export const getProjects = () => {
+export const getCurrentUser = () => {
+  const storedUserId = localStorage.getItem('primeflow_current_user');
+  if (storedUserId) {
+    return users.find(u => u.id === storedUserId) || null;
+  }
+  return null; // Return null if not logged in
+};
+
+export const login = (emailOrUsername, password) => {
+  const user = users.find(
+    u => (u.email === emailOrUsername || u.username === emailOrUsername) && u.password === password
+  );
+  if (user) {
+    localStorage.setItem('primeflow_current_user', user.id);
+    return { success: true, user };
+  }
+  return { success: false, message: 'Usuário ou senha incorretos' };
+};
+
+export const register = (userData) => {
+  const existingUser = users.find(u => u.email === userData.email || u.username === userData.username);
+  if (existingUser) {
+    return { success: false, message: 'E-mail ou usuário já cadastrado' };
+  }
+
+  const newUser = {
+    id: `usr-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`,
+    ...userData,
+    createdAt: new Date().toISOString()
+  };
+  users.push(newUser);
+
+  // Create a default project for the new user
+  const newProject = {
+    id: `proj-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`,
+    name: 'Meu Primeiro Projeto',
+    description: 'Projeto padrão',
+    ownerId: newUser.id,
+    members: [newUser.id],
+    columns: [],
+    createdAt: new Date().toISOString(),
+    status: 'active'
+  };
+  projects.push(newProject);
+
+  // Create default columns
+  const colA = { id: `col-${Math.floor(Math.random() * 10000)}`, projectId: newProject.id, title: 'A Fazer', taskIds: [], createdAt: new Date().toISOString() };
+  const colB = { id: `col-${Math.floor(Math.random() * 10000)}`, projectId: newProject.id, title: 'Em Andamento', taskIds: [], createdAt: new Date().toISOString() };
+  const colC = { id: `col-${Math.floor(Math.random() * 10000)}`, projectId: newProject.id, title: 'Concluído', taskIds: [], createdAt: new Date().toISOString() };
+
+  newProject.columns = [colA.id, colB.id, colC.id];
+  columns.push(colA, colB, colC);
+
+  saveToStorage();
+
+  localStorage.setItem('primeflow_current_user', newUser.id);
+  return { success: true, user: newUser };
+};
+
+export const logout = () => {
+  localStorage.removeItem('primeflow_current_user');
+};
+
+export const getProjects = (userId) => {
+  if (userId) {
+    return projects.filter(p => p.ownerId === userId || p.members.includes(userId));
+  }
   return projects;
 };
 
@@ -61,7 +129,7 @@ export const saveTask = (task) => {
       65 + Math.floor(Math.random() * 26)
     );
     const randomNumbers = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-    
+
     const newTask = {
       ...task,
       id: `${randomLetters}-${randomNumbers}`,
