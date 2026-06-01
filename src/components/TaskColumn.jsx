@@ -1,13 +1,22 @@
 import React from 'react';
+import { useDroppable } from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { Plus, Edit2, Trash2 } from 'lucide-react';
 import TaskCard from './TaskCard';
 
-const TaskColumn = ({ id, title, count, tasks, onCardClick, onAddClick, onEditColumn, onDeleteColumn, onDragStart, onDrop, onDragOver }) => {
+const TaskColumn = ({ id, title, count, tasks, activeTaskId, onCardClick, onAddClick, onEditColumn, onDeleteColumn }) => {
+  const { isOver, setNodeRef } = useDroppable({
+    id,
+  });
+
+  const taskIds = tasks.map(task => task.id);
+
   return (
-    <div 
-      className="bg-prime-white border border-prime-branco-bord rounded-col w-[302px] shrink-0 flex flex-col overflow-hidden"
-      onDrop={onDrop}
-      onDragOver={onDragOver}
+    <div
+      ref={setNodeRef}
+      className={`bg-prime-white border rounded-col w-[302px] shrink-0 flex flex-col overflow-hidden transition-all ${
+        isOver ? 'border-prime-azul shadow-[0_0_0_2px_var(--color-prime-azul-ring)]' : 'border-prime-branco-bord'
+      }`}
     >
       <div className="px-5 pt-4 pb-3.5 border-b border-prime-branco-bord text-[15px] font-bold text-prime-preto flex items-center justify-between">
         <div className="flex items-center gap-2 max-w-[80%]">
@@ -27,14 +36,16 @@ const TaskColumn = ({ id, title, count, tasks, onCardClick, onAddClick, onEditCo
       </div>
 
       <div className="p-3.5 flex flex-col gap-3 overflow-y-auto max-h-[calc(100vh-200px)]">
-        {tasks.map((task) => (
-          <TaskCard
-            key={task.id}
-            task={task}
-            onClick={() => onCardClick(task)}
-            onDragStart={(e) => onDragStart(e, task.id, id)}
-          />
-        ))}
+        <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
+          {tasks.map((task) => (
+            <TaskCard
+              key={task.id}
+              task={task}
+              isActive={activeTaskId === task.id}
+              onClick={() => onCardClick(task)}
+            />
+          ))}
+        </SortableContext>
 
         <button
           onClick={onAddClick}
