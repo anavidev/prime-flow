@@ -1,8 +1,10 @@
 import React from 'react';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { Calendar, ChevronsDown } from 'lucide-react';
 import { users } from '../dados';
 
-const TaskCard = ({ task, onClick, onDragStart }) => {
+const TaskCardContent = ({ task }) => {
   // Buscar a inicial do primeiro assignee mockado
   const firstAssignee = task.assignees?.length > 0
     ? users.find(u => u.id === task.assignees[0])
@@ -14,12 +16,7 @@ const TaskCard = ({ task, onClick, onDragStart }) => {
     : 'DD/MM/AAAA';
 
   return (
-    <div
-      draggable
-      onDragStart={onDragStart}
-      className="bg-prime-card-bg rounded-card p-4 pb-3.5 flex flex-col gap-2 cursor-pointer transition-shadow hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] cursor-grab active:cursor-grabbing"
-      onClick={onClick}
-    >
+    <>
       <div className="text-[15px] font-bold text-prime-preto leading-[1.4]">
         {task.title || 'Um título de tarefa do projeto.'}
       </div>
@@ -46,6 +43,47 @@ const TaskCard = ({ task, onClick, onDragStart }) => {
           )}
         </div>
       </div>
+    </>
+  );
+};
+
+const TaskCard = ({ task, onClick, isOverlay = false, isActive = false }) => {
+  if (isOverlay) {
+    return (
+      <div className="bg-prime-card-bg rounded-card p-4 pb-3.5 flex flex-col gap-2 shadow-[0_12px_28px_rgba(0,0,0,0.18)] rotate-[1deg]">
+        <TaskCardContent task={task} />
+      </div>
+    );
+  }
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: task.id,
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className={`bg-prime-card-bg rounded-card p-4 pb-3.5 flex flex-col gap-2 cursor-pointer transition-[box-shadow,transform,opacity] duration-200 hover:shadow-[0_6px_16px_rgba(0,0,0,0.1)] ${
+        isDragging ? 'opacity-30 scale-[0.98]' : 'opacity-100'
+      } cursor-grab active:cursor-grabbing ${isActive && !isDragging ? 'ring-2 ring-prime-azul/20' : ''}`}
+      onClick={!isDragging ? onClick : undefined}
+    >
+      <TaskCardContent task={task} />
     </div>
   );
 };

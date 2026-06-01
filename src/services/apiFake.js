@@ -176,18 +176,35 @@ export const updateColumn = (columnId, newTitle) => {
   saveToStorage();
 };
 
-export const moveTask = (taskId, sourceColumnId, destColumnId) => {
-  if (sourceColumnId === destColumnId) return;
+export const moveTask = (taskId, sourceColumnId, destColumnId, destIndex = null) => {
 
   const sourceCol = columns.find(c => c.id === sourceColumnId);
   const destCol = columns.find(c => c.id === destColumnId);
   const task = tasks.find(t => t.id === taskId);
 
   if (sourceCol && destCol && task) {
-    // Remove from source col
-    sourceCol.taskIds = sourceCol.taskIds.filter(id => id !== taskId);
-    // Add to dest col
-    destCol.taskIds.push(taskId);
+    const sourceIds = sourceCol.taskIds.filter(id => id !== taskId);
+
+    if (sourceCol.id === destCol.id) {
+      const safeIndex = typeof destIndex === 'number'
+        ? Math.max(0, Math.min(destIndex, sourceIds.length))
+        : sourceIds.length;
+      sourceIds.splice(safeIndex, 0, taskId);
+      sourceCol.taskIds = sourceIds;
+      task.columnId = sourceCol.id;
+      saveToStorage();
+      return;
+    }
+
+    sourceCol.taskIds = sourceIds;
+
+    const destIds = destCol.taskIds.filter(id => id !== taskId);
+    const safeIndex = typeof destIndex === 'number'
+      ? Math.max(0, Math.min(destIndex, destIds.length))
+      : destIds.length;
+    destIds.splice(safeIndex, 0, taskId);
+    destCol.taskIds = destIds;
+
     // Update task's columnId
     task.columnId = destColumnId;
 
