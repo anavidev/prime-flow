@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, ChevronDown, X } from 'lucide-react';
-import { users, tags } from '../dados';
+import { tags } from '../dados';
+import { getUsers } from '../services/apiFake';
 
 const TaskModal = ({ isOpen, onClose, task, onSave, onDelete }) => {
   const [formData, setFormData] = useState(null);
@@ -12,6 +13,8 @@ const TaskModal = ({ isOpen, onClose, task, onSave, onDelete }) => {
   }, [task]);
 
   if (!isOpen || !formData) return null;
+
+  const users = getUsers();
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));

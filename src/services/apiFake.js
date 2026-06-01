@@ -42,6 +42,10 @@ export const getCurrentUser = () => {
   return null; // Return null if not logged in
 };
 
+export const getUsers = () => {
+  return [...users];
+};
+
 export const login = (emailOrUsername, password) => {
   const user = users.find(
     u => (u.email === emailOrUsername || u.username === emailOrUsername) && u.password === password

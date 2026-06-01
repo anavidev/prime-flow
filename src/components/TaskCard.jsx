@@ -2,9 +2,10 @@ import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Calendar, ChevronsDown } from 'lucide-react';
-import { users } from '../dados';
+import { getUsers } from '../services/apiFake';
 
 const TaskCardContent = ({ task }) => {
+  const users = getUsers();
   const firstAssignee = task.assignees?.length > 0
     ? users.find(u => u.id === task.assignees[0])
     : null;
